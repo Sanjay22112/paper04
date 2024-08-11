@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Exam</title>
+    <style>
+        /* Container styling */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            margin: auto;
+        }
+
+        /* Header styling */
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Timer styling */
+        #timer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Question box styling */
+        .left-box {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* Options styling */
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Button styling */
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #submit {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #submit:hover {
+            background-color: #218838;
+        }
+
+        /* Score and answer container styling */
+        #score-container, #answers-container {
+            margin-top: 20px;
+        }
+
+        #final-score {
+            font-weight: bold;
+        }
+
+        .answer-details {
+            margin-bottom: 20px;
+        }
+
+        .correct-answer, .chosen-answer {
+            font-weight: bold;
+        }
+
+        /* Completion message styling */
+        #completion-message {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        /* Question list styling */
+        #question-list {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .question-link {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin: 5px;
+            text-align: center;
+            flex: 1 1 10%;
+        }
+
+        .question-link:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Online Exam</h1>
+        <div id="timer">Time Left: <span id="time">15:00</span></div>
+        <div class="left-box">
+            <div id="question-container"></div>
+            <div class="buttons">
+                <button id="clear-response">Clear Response</button>
+                <button id="previous-question">Previous Question</button>
+                <button id="next-question">Next Question</button>
+                <button id="submit">Submit</button>
+            </div>
+            <div id="completion-message"></div>
+        </div>
+        <div id="score-container" style="display: none;">
+            <p>Marks Obtained: <span id="final-score">0</span>/<span id="total-marks">0</span></p>
+            <button id="retry">Retry</button>
+            <button id="show-answers">Show Answers</button>
+        </div>
+        <div id="answers-container" style="display: none;">
+            <h2>Answers</h2>
+            <div id="answers-list"></div>
+        </div>
+        <div id="question-list">
+            <!-- Buttons for Q1 to Q25 -->
+            <!-- Dynamically generated buttons will go here -->
+        </div>
+    </div>
+    <script>
+        // Questions data
+        const questions = [
+  { "question": "1. दिए गए क्षेत्रों में से किस क्षेत्र में मुख्य रूप से सामाजिक कल्याण के विचारों द्वारा संचालित किया जाता है?", "options": ["ए विदेशी", "बी सहकारी", "सी सार्वजनिक", "डी निजी"], "answer": "सी" },
+  { "question": "2. हिंदू कॉलेज की स्थापना 1791 में __ में हुई थी।", "options": ["ए कलकत्ता", "बी ढाका", "सी सूरत", "डी बनारस"], "answer": "डी" },
+  { "question": "3. ज्योतिबा फुले ने 1873 में 'गुलामगिरी' किस भाषा में लिखी थी?", "options": ["ए अंग्रेजी", "बी मराठी", "सी हिंदी", "डी गुजराती"], "answer": "बी" },
+  { "question": "4. निम्नलिखित में से कौन केवल रबी की फसलें हैं?", "options": ["ए मक्का और मटर", "बी जौ और चना", "सी धान और कपास", "डी गेहूं और ज्वार"], "answer": "बी" },
+  { "question": "5. ऐसे जीवों का एक उदाहरण बताइए जो स्वतंत्र रूप से तैरने वाले और तल पर रहने वाले रूप हैं।", "options": ["ए पादप प्लवक", "बी जूप्लैंकटन", "सी कवक", "डी जेलीफ़िश"], "answer": "बी" },
+  { "question": "6. निम्नलिखित विकल्पों में से किस शहर ने अंतर्राष्ट्रीय सैन्य खेल परिषद द्वारा आयोजित 2019 सैन्य विश्व खेलों की मेजबानी की?", "options": ["ए रियो डी जेनेरो, ब्राजील", "बी बोगोटा, कोलंबिया", "सी वुहान, चीन", "डी मुंग्योंग, दक्षिण कोरिया"], "answer": "सी" },
+  { "question": "7. अब्दुल करीम खान किस घराने के कलाकार थे?", "options": ["ए जयपुर घराना", "बी ग्वालियर घराना", "सी दिल्ली घराना", "डी किराना घराना"], "answer": "डी" },
+  { "question": "8. बिहार के मुख्यमंत्री के रूप में किसने 8वीं बार शपथ ली है?", "options": ["ए तेजस्वी यादव", "बी प्रमोद सावंत", "सी अनुग्रह नारायण", "डी नीतीश कुमार"], "answer": "डी" },
+  { "question": "9. कोशिका चक्र के बारे में निम्नलिखित में से कौन सा कथन गलत है?", "options": ["ए जी2 चरण में माइटोसिस की तैयारी होती है।", "बी एम चरण में, कोशिका भौतिक रूप से बड़ी हो जाती है और ऑर्गेनेल की नकल करती है।", "सी एस चरण में डीएनए का प्रतिकृतिकरण होता है।", "डी जी1 चरण में कोशिका भौतिक रूप से बड़ी हो जाती है और ऑर्गेनेल की नकल करती है।"], "answer": "बी" },
+  { "question": "10. श्यामजी कृष्ण वर्मा ने 1905 में _____ में इंडिया हाउस की स्थापना की।", "options": ["ए न्यूयॉर्क", "बी बॉम्बे", "सी पेरिस", "डी लंदन"], "answer": "डी" },
+  { "question": "11. 'इंदिरा गांधी शहरी रोजगार गारंटी योजना 2022' किस राज्य सरकार द्वारा लागू की गई है?", "options": ["ए राजस्थान", "बी हिमाचल प्रदेश", "सी महाराष्ट्र", "डी उत्तर प्रदेश"], "answer": "ए" },
+  { "question": "12. निम्नलिखित विकल्पों में से सही जोड़ी चुनें।", "options": ["ए तीसरी पंचवर्षीय योजना - तेजी से औद्योगीकरण और बुनियादी उद्योग", "बी चौथी पंचवर्षीय योजना - परिवार नियोजन कार्यक्रम", "सी पहली पंचवर्षीय योजना - महालनोबिस मॉडल", "डी दूसरी पंचवर्षीय योजना - कृषि पर ध्यान केंद्रित"], "answer": "बी" },
+  { "question": "13. भारत के संविधान में मौलिक कर्तव्यों को भारत के किस प्रधानमंत्री के नेतृत्व में जोड़ा गया था?", "options": ["ए नरसिंह राव", "बी चरण सिंह", "सी इंदिरा गांधी", "डी लाल बहादुर शास्त्री"], "answer": "सी" },
+  { "question": "14. निम्नलिखित में से कौन सा त्योहार अगस्त-सितंबर महीने में मनाया जाता है?", "options": ["ए मकर संक्रांति", "बी पतंग उत्सव", "सी बीकानेर महोत्सव", "डी ओणम"], "answer": "डी" },
+  { "question": "15. 'मिशन कुशल कर्मी' निर्माण श्रमिकों के कौशल को अपग्रेड करने के लिए शुरू किया गया था। इस कार्यक्रम की शुरुआत __ की सरकार ने की थी।", "options": ["ए गुजरात", "बी हरियाणा", "सी पंजाब", "डी दिल्ली"], "answer": "डी" },
+  { "question": "16. युवा ओलंपिक खेलों का पहला संस्करण ___ में हुआ था।", "options": ["ए लॉज़ेन", "बी सिंगापुर", "सी नानजिंग", "डी इन्सब्रुक"], "answer": "बी" },
+  { "question": "17. कांटेदार झाड़ियाँ __ क्षेत्र में पाई जाती हैं।", "options": ["ए भूमध्यसागरीय", "बी ध्रुवीय", "सी शुष्क रेगिस्तान", "डी उच्च वर्षा"], "answer": "सी" },
+  { "question": "18. निम्नलिखित में से कौन सा लोक नृत्य गुजरात राज्य से संबंधित नहीं है?", "options": ["ए गरबा", "बी डांडिया रास", "सी बिदेशिया", "डी विंचुड़ो"], "answer": "सी" },
+  { "question": "19. निम्नलिखित में से किसे 2003 में पद्म विभूषण पुरस्कार से सम्मानित किया गया था?", "options": ["ए सोनल मानसिंह", "बी कुमुदिनी लखिया", "सी शोभाना नारायण", "डी सुनयना हजारिलाल"], "answer": "ए" },
+  { "question": "20. त्वरण का SI मात्रक __ है।", "options": ["ए मीटर²/सेकेंड", "बी मीटर²/सेकेंड²", "सी मीटर/सेकेंड", "डी मीटर/सेकेंड²"], "answer": "डी" },
+  { "question": "21. संगम काव्य में उल्लिखित तमिल शब्द 'मुवेंदर' का अर्थ है ___।", "options": ["ए धम्म महामत्त", "बी मुखिया", "सी अमीर", "डी तीन प्रमुख"], "answer": "डी" },
+  { "question": "22. भारत के उपराष्ट्रपति का चुनाव __ वर्षों के लिए किया जाता है।", "options": ["ए 6", "बी 5", "सी 2", "डी 3"], "answer": "बी" },
+  { "question": "23. निम्नलिखित में से कौन सा सर्वोत्तम गुणवत्ता वाला कोयला है?", "options": ["ए लिग्नाइट", "बी बिटुमिनस", "सी पीट", "डी एंथ्रेसाइट"], "answer": "डी" },
+  { "question": "24. बैक्टीरिया के फ्लैगेलम के तीन भाग कौन से हैं?", "options": ["ए सिर, पूंछ और निचला शरीर", "बी फिलामेंट, पूंछ और हुक", "सी बेसल बॉडी, पूंछ और फिलामेंट", "डी फिलामेंट, हुक और बेसल बॉडी"], "answer": "डी" },
+  { "question": "25. यौगिक CaOCl₂ का सामान्य नाम __ है।", "options": ["ए ब्लीचिंग पाउडर", "बी धोने का सोडा", "सी बेकिंग सोडा", "डी जिप्सम"], "answer": "ए" }
+];
+
+
+        let currentQuestionIndex = 0;
+        let selectedAnswers = [];
+
+        function startTimer() {
+            let timeLeft = 15 * 60; // 15 minutes in seconds
+            const timerElement = document.getElementById('time');
+            const intervalId = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                timeLeft--;
+
+                if (timeLeft < 0) {
+                    clearInterval(intervalId);
+                    alert("Time's up!");
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion(index) {
+            if (index < 0 || index >= questions.length) return;
+
+            currentQuestionIndex = index;
+            const questionContainer = document.getElementById('question-container');
+            questionContainer.innerHTML = '';
+
+            const questionElement = document.createElement('div');
+            questionElement.id = 'question';
+            questionElement.innerHTML = `<strong>${questions[index].question}</strong>`;
+
+            const optionsElement = document.createElement('div');
+            optionsElement.className = 'options';
+
+            questions[index].options.forEach(option => {
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'option';
+                input.value = option.charAt(0);
+                if (selectedAnswers[index] === option.charAt(0)) {
+                    input.checked = true;
+                }
+                input.addEventListener('change', () => {
+                    selectedAnswers[currentQuestionIndex] = input.value;
+                });
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(option));
+                optionsElement.appendChild(label);
+            });
+
+            questionElement.appendChild(optionsElement);
+            questionContainer.appendChild(questionElement);
+        }
+
+        function submitExam() {
+            let score = 0;
+
+            questions.forEach((question, index) => {
+                const selectedOption = selectedAnswers[index];
+                if (selectedOption === question.answer) {
+                    score += 2;
+                } else if (selectedOption) {
+                    score -= 0.5;
+                }
+            });
+
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('total-marks').textContent = questions.length * 2;
+
+            document.getElementById('question-list').style.display = 'none';
+            document.getElementById('question-container').style.display = 'none';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('score-container').style.display = 'block';
+            document.getElementById('completion-message').textContent = "Thanks for submitting!";
+            document.getElementById('completion-message').style.display = 'block';
+        }
+
+        document.getElementById('retry').addEventListener('click', () => {
+            selectedAnswers = [];
+            document.getElementById('score-container').style.display = 'none';
+            document.getElementById('answers-container').style.display = 'none';
+            document.getElementById('completion-message').style.display = 'none';
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('question-list').style.display = 'flex';
+            document.getElementById('question-container').style.display = 'block';
+            loadQuestion(0);
+        });
+
+        document.getElementById('show-answers').addEventListener('click', () => {
+            const answersList = document.getElementById('answers-list');
+            answersList.innerHTML = ''; // Clear existing answers
+
+            questions.forEach((question, index) => {
+                const answerElement = document.createElement('div');
+                answerElement.className = 'answer-details';
+
+                // Display the question text
+                const questionText = document.createElement('div');
+                questionText.innerHTML = `<strong>${question.question}</strong>`;
+                answerElement.appendChild(questionText);
+
+                // Display all options for the question
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+                question.options.forEach(option => {
+                    const optionItem = document.createElement('li');
+                    optionItem.textContent = option;
+                    optionsList.appendChild(optionItem);
+                });
+                answerElement.appendChild(optionsList);
+
+                // Display the chosen answer
+                const chosenAnswer = selectedAnswers[index];
+                const chosenAnswerText = document.createElement('div');
+                chosenAnswerText.innerHTML = `Your answer: <span class="chosen-answer">${chosenAnswer ? chosenAnswer : 'Not Answered'}</span>`;
+                answerElement.appendChild(chosenAnswerText);
+
+                // Display the correct answer
+                const correctAnswerText = document.createElement('div');
+                correctAnswerText.innerHTML = `Correct answer: <span class="correct-answer">${question.answer}</span>`;
+                answerElement.appendChild(correctAnswerText);
+
+                                // Append the answer details to the answers list
+                answersList.appendChild(answerElement);
+            });
+
+            document.getElementById('score-container').style.display = 'none';
+            document.getElementById('answers-container').style.display = 'block';
+        });
+
+        document.getElementById('clear-response').addEventListener('click', () => {
+            selectedAnswers[currentQuestionIndex] = undefined;
+            loadQuestion(currentQuestionIndex);
+        });
+
+        document.getElementById('previous-question').addEventListener('click', () => {
+            loadQuestion(currentQuestionIndex - 1);
+        });
+
+        document.getElementById('next-question').addEventListener('click', () => {
+            loadQuestion(currentQuestionIndex + 1);
+        });
+
+        document.getElementById('submit').addEventListener('click', () => {
+            if (confirm("Are you sure you want to submit?")) {
+                submitExam();
+            }
+        });
+
+        function createQuestionButtons() {
+            const questionList = document.getElementById('question-list');
+            questionList.innerHTML = ''; // Clear existing buttons
+
+            for (let i = 1; i <= 25; i++) {
+                const button = document.createElement('button');
+                button.className = 'question-link';
+                button.textContent = `Q${i}`;
+                button.addEventListener('click', () => {
+                    loadQuestion(i - 1);
+                });
+                questionList.appendChild(button);
+            }
+        }
+
+        window.onload = () => {
+            createQuestionButtons();
+            startTimer();
+            loadQuestion(0);
+        };
+
+        // Disable right-click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Disable text selection and copying
+        document.addEventListener('selectstart', event => event.preventDefault());
+        document.addEventListener('copy', event => event.preventDefault());
+    </script>
+</body>
+</html>
+
